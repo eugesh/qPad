@@ -1,18 +1,135 @@
 #include "numpadtextedit.h"
 
+#include <QEventLoop>
 #include <QKeyEvent>
+#include <QTimer>
+
+#define AutoDisconnect(l) \
+    QSharedPointer<QMetaObject::Connection> l = QSharedPointer<QMetaObject::Connection>(\
+        new QMetaObject::Connection(), \
+        [](QMetaObject::Connection * conn) { /*QSharedPointer сам по себе не производит отключения при удалении*/ \
+            QObject::disconnect(*conn);\
+        }\
+    ); *l //-- Use AutoDisconnect(conn1) = connect(....);
+
 
 NumPadTextEdit::NumPadTextEdit(QWidget *parent) : QTextEdit(parent)
 {
-
+    m_combKeysTimer = new QTimer(this);
+    //connect(m_combKeysTimer, &QTimer::timeout, this, &NumPadTextEdit::onCombKeysTimeout);
 }
 
 void
 NumPadTextEdit::keyPressEvent(QKeyEvent *e)
 {
-    if ((e->key() == Qt::Key_3) && (e->modifiers() & Qt::KeypadModifier)) {
-        insertPlainText("k");
-    } else {
+    if (!((e->modifiers() & Qt::KeypadModifier)) || e->key() == Qt::Key_Enter)
         QTextEdit::keyPressEvent(e);
+
+    m_key_queue.append(e->key());
+
+    if (m_key_queue.count() == 1)
+        eventLoopForComb();
+
+    if (m_key_queue.count() == 2 && m_key_queue[0] == Qt::Key_0 &&
+        (m_key_queue[1] == Qt::Key_0 || m_key_queue[1] == Qt::Key_1))
+        m_combKeysTimer->start(m_combKeysTimeout);
+}
+
+void NumPadTextEdit::eventLoopForComb()
+{
+    QEventLoop _loop;
+
+    AutoDisconnect(conn) = connect(m_combKeysTimer, &QTimer::timeout, [=,&_loop]() {
+        onCombKeysTimeout();
+        _loop.exit();
+    });
+
+    m_combKeysTimer->start(m_combKeysTimeout);
+
+    _loop.exec();
+}
+
+void NumPadTextEdit::onCombKeysTimeout()
+{
+    if (m_key_queue.size() == 4) {
+        m_key_queue.pop_front();
+        m_key_queue.pop_front();
+        if (m_key_queue.contains(Qt::Key_Period))
+            insertPlainText("w");
+        else if (m_key_queue[0] == Qt::Key_0 && m_key_queue[1])
+            insertPlainText("b");
+        /*if (m_key_queue[0] == Qt::Key_0 && m_key_queue[1] == Qt::Key_0 &&
+            m_key_queue[2] == Qt::Key_0)
+        {
+            if (m_key_queue[3] == Qt::Key_0)
+                insertPlainText("b");
+            if (m_key_queue[3] == Qt::Key_Period)
+                insertPlainText("w");
+        }*/
+    } else if (m_key_queue.size() == 3) {
+        if (m_key_queue.contains(Qt::Key_4)) {
+            insertPlainText("i");
+        }
+        if (m_key_queue.contains(Qt::Key_5)) {
+            insertPlainText("l");
+        }
+    } else if (m_key_queue.size() == 2) {
+        if (m_key_queue.contains(Qt::Key_1) && m_key_queue.contains(Qt::Key_2)) {
+            insertPlainText("s");
+        } else if (m_key_queue.contains(Qt::Key_1) && m_key_queue.contains(Qt::Key_4)) {
+            insertPlainText("m");
+        } else if (m_key_queue.contains(Qt::Key_2) && m_key_queue.contains(Qt::Key_3)) {
+            insertPlainText("x");
+        } else if (m_key_queue.contains(Qt::Key_2) && m_key_queue.contains(Qt::Key_5)) {
+            insertPlainText("f");
+        } else if (m_key_queue.contains(Qt::Key_3) && m_key_queue.contains(Qt::Key_6)) {
+            insertPlainText("d");
+        } else if (m_key_queue.contains(Qt::Key_3) && m_key_queue.contains(Qt::Key_Period)) {
+            insertPlainText("c");
+        } else if (m_key_queue.contains(Qt::Key_4) && m_key_queue.contains(Qt::Key_5)) {
+            insertPlainText("p");
+        } else if (m_key_queue.contains(Qt::Key_5) && m_key_queue.contains(Qt::Key_6)) {
+            insertPlainText("y");
+        } else if (m_key_queue.contains(Qt::Key_7) && m_key_queue.contains(Qt::Key_8)) {
+            QString text = toPlainText();
+            text.chop(1);
+            setPlainText(text);
+            QTextCursor curs = textCursor();
+            int pos = curs.position();
+            curs.setPosition(pos - 1);
+            setTextCursor(curs);
+        } else if (m_key_queue.contains(Qt::Key_8) && m_key_queue.contains(Qt::Key_9)) {
+            insertPlainText("r");
+        } else if (m_key_queue.contains(Qt::Key_multiply) && m_key_queue.contains(Qt::Key_Minus)) {
+                    insertPlainText(".");
+        } else if (m_key_queue.contains(Qt::Key_multiply) && m_key_queue.contains(Qt::Key_division)) {
+            insertPlainText(",");
+        }
+    } else if (m_key_queue.size() == 1) {
+        if (m_key_queue.back() == Qt::Key_8) {
+            insertPlainText("t");
+        } else if (m_key_queue.back() == Qt::Key_7) {
+            insertPlainText("q");
+        } else if (m_key_queue.back() == Qt::Key_6) {
+            insertPlainText("a");
+        } else if (m_key_queue.back() == Qt::Key_5) {
+            insertPlainText("e");
+        } else if (m_key_queue.back() == Qt::Key_4) {
+            insertPlainText("d");
+        } else if (m_key_queue.back() == Qt::Key_3) {
+            insertPlainText("k");
+        } else if (m_key_queue.back() == Qt::Key_2 || m_key_queue.back() == Qt::Key_9) {
+            insertPlainText("h");
+        } else if (m_key_queue.back() == Qt::Key_1) {
+            insertPlainText("o");
+        } else if (m_key_queue.back() == Qt::Key_0) {
+            insertPlainText("g");
+        } else if (m_key_queue.back() == Qt::Key_Plus) {
+            insertPlainText("z");
+        } else if (m_key_queue.back() == Qt::Key_Period) {
+            insertPlainText("u");
+        }
     }
+
+    m_key_queue.clear();
 }
