@@ -19,7 +19,7 @@ private slots:
 
 private:
     QTimer *m_combKeysTimer;
-    int m_combKeysTimeout = 300; // ms
+    int m_combKeysTimeout = 200; // ms
     Qt::Key m_last_key; // First fake modifier
     Qt::Key m_mod_key_one; // First fake modifier
     Qt::Key m_mod_key_second; // Second fake modifier

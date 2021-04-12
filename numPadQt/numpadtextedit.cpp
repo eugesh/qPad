@@ -4,6 +4,8 @@
 #include <QKeyEvent>
 #include <QTimer>
 
+#define SDL_SCANCODE_KP_000 0 // Define it! '000' button. It may differ from value defined in SDL
+
 #define AutoDisconnect(l) \
     QSharedPointer<QMetaObject::Connection> l = QSharedPointer<QMetaObject::Connection>(\
         new QMetaObject::Connection(), \
@@ -29,9 +31,6 @@ NumPadTextEdit::keyPressEvent(QKeyEvent *e)
 
     if (m_key_queue.count() == 1)
         eventLoopForComb();
-
-    if (m_key_queue.count() == 2 && m_key_queue[0] == Qt::Key_0 && m_key_queue[1] == Qt::Key_0)
-        m_combKeysTimer->start(m_combKeysTimeout);
 }
 
 void NumPadTextEdit::eventLoopForComb()
@@ -50,15 +49,12 @@ void NumPadTextEdit::eventLoopForComb()
 
 void NumPadTextEdit::onCombKeysTimeout()
 {
-    if (m_key_queue.size() == 4) {
-        m_key_queue.pop_front();
-        m_key_queue.pop_front();
-        if (m_key_queue.contains(Qt::Key_Period))
+    if (m_key_queue.size() == 2) {
+        if (m_key_queue.contains(SDL_SCANCODE_KP_000) && m_key_queue.contains(Qt::Key_Period)) {
             insertPlainText("w");
-        else if (m_key_queue[0] == Qt::Key_0 && m_key_queue[1])
+        } else if (m_key_queue.contains(SDL_SCANCODE_KP_000) && m_key_queue.contains(Qt::Key_0)) {
             insertPlainText("b");
-    } else if (m_key_queue.size() == 2) {
-        if (m_key_queue.contains(Qt::Key_1) && m_key_queue.contains(Qt::Key_2)) {
+        } else if (m_key_queue.contains(Qt::Key_1) && m_key_queue.contains(Qt::Key_2)) {
             insertPlainText("v");
         } else if (m_key_queue.contains(Qt::Key_1) && m_key_queue.contains(Qt::Key_4)) {
             insertPlainText("m");
