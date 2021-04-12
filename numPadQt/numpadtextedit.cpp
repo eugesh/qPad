@@ -30,8 +30,7 @@ NumPadTextEdit::keyPressEvent(QKeyEvent *e)
     if (m_key_queue.count() == 1)
         eventLoopForComb();
 
-    if (m_key_queue.count() == 2 && m_key_queue[0] == Qt::Key_0 &&
-        (m_key_queue[1] == Qt::Key_0 || m_key_queue[1] == Qt::Key_1))
+    if (m_key_queue.count() == 2 && m_key_queue[0] == Qt::Key_0 && m_key_queue[1] == Qt::Key_0)
         m_combKeysTimer->start(m_combKeysTimeout);
 }
 
@@ -58,21 +57,6 @@ void NumPadTextEdit::onCombKeysTimeout()
             insertPlainText("w");
         else if (m_key_queue[0] == Qt::Key_0 && m_key_queue[1])
             insertPlainText("b");
-        /*if (m_key_queue[0] == Qt::Key_0 && m_key_queue[1] == Qt::Key_0 &&
-            m_key_queue[2] == Qt::Key_0)
-        {
-            if (m_key_queue[3] == Qt::Key_0)
-                insertPlainText("b");
-            if (m_key_queue[3] == Qt::Key_Period)
-                insertPlainText("w");
-        }*/
-    } else if (m_key_queue.size() == 3) {
-        if (m_key_queue.contains(Qt::Key_4)) {
-            insertPlainText("i");
-        }
-        if (m_key_queue.contains(Qt::Key_5)) {
-            insertPlainText("l");
-        }
     } else if (m_key_queue.size() == 2) {
         if (m_key_queue.contains(Qt::Key_1) && m_key_queue.contains(Qt::Key_2)) {
             insertPlainText("v");
@@ -88,6 +72,8 @@ void NumPadTextEdit::onCombKeysTimeout()
             insertPlainText("c");
         } else if (m_key_queue.contains(Qt::Key_4) && m_key_queue.contains(Qt::Key_5)) {
             insertPlainText("p");
+        } else if (m_key_queue.contains(Qt::Key_4) && m_key_queue.contains(Qt::Key_7)) {
+            insertPlainText("l");
         } else if (m_key_queue.contains(Qt::Key_5) && m_key_queue.contains(Qt::Key_6)) {
             insertPlainText("k");
         } else if (m_key_queue.contains(Qt::Key_6) && m_key_queue.contains(Qt::Key_9)) {
@@ -129,6 +115,8 @@ void NumPadTextEdit::onCombKeysTimeout()
             insertPlainText("z");
         } else if (m_key_queue.back() == Qt::Key_Period) {
             insertPlainText("u");
+        } else if (m_key_queue.back() == Qt::Key_Asterisk) {
+            insertPlainText("i");
         }
     }
 
