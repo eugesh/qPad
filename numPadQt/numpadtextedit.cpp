@@ -75,7 +75,7 @@ void NumPadTextEdit::onCombKeysTimeout()
         }
     } else if (m_key_queue.size() == 2) {
         if (m_key_queue.contains(Qt::Key_1) && m_key_queue.contains(Qt::Key_2)) {
-            insertPlainText("s");
+            insertPlainText("v");
         } else if (m_key_queue.contains(Qt::Key_1) && m_key_queue.contains(Qt::Key_4)) {
             insertPlainText("m");
         } else if (m_key_queue.contains(Qt::Key_2) && m_key_queue.contains(Qt::Key_3)) {
@@ -83,30 +83,31 @@ void NumPadTextEdit::onCombKeysTimeout()
         } else if (m_key_queue.contains(Qt::Key_2) && m_key_queue.contains(Qt::Key_5)) {
             insertPlainText("f");
         } else if (m_key_queue.contains(Qt::Key_3) && m_key_queue.contains(Qt::Key_6)) {
-            insertPlainText("d");
+            insertPlainText("n");
         } else if (m_key_queue.contains(Qt::Key_3) && m_key_queue.contains(Qt::Key_Period)) {
             insertPlainText("c");
         } else if (m_key_queue.contains(Qt::Key_4) && m_key_queue.contains(Qt::Key_5)) {
             insertPlainText("p");
         } else if (m_key_queue.contains(Qt::Key_5) && m_key_queue.contains(Qt::Key_6)) {
+            insertPlainText("k");
+        } else if (m_key_queue.contains(Qt::Key_6) && m_key_queue.contains(Qt::Key_9)) {
             insertPlainText("y");
         } else if (m_key_queue.contains(Qt::Key_7) && m_key_queue.contains(Qt::Key_8)) {
             QString text = toPlainText();
             text.chop(1);
-            setPlainText(text);
-            QTextCursor curs = textCursor();
-            int pos = curs.position();
-            curs.setPosition(pos - 1);
-            setTextCursor(curs);
+            clear();
+            insertPlainText(text);
         } else if (m_key_queue.contains(Qt::Key_8) && m_key_queue.contains(Qt::Key_9)) {
             insertPlainText("r");
-        } else if (m_key_queue.contains(Qt::Key_multiply) && m_key_queue.contains(Qt::Key_Minus)) {
-                    insertPlainText(".");
-        } else if (m_key_queue.contains(Qt::Key_multiply) && m_key_queue.contains(Qt::Key_division)) {
+        } else if (m_key_queue.contains(Qt::Key_Asterisk) && m_key_queue.contains(Qt::Key_Minus)) {
+            insertPlainText(".");
+        } else if (m_key_queue.contains(Qt::Key_Asterisk) && m_key_queue.contains(Qt::Key_Slash)) {
             insertPlainText(",");
         }
     } else if (m_key_queue.size() == 1) {
-        if (m_key_queue.back() == Qt::Key_8) {
+        if (m_key_queue.back() == Qt::Key_9) {
+            insertPlainText("j");
+        } else if (m_key_queue.back() == Qt::Key_8) {
             insertPlainText("t");
         } else if (m_key_queue.back() == Qt::Key_7) {
             insertPlainText("q");
@@ -117,8 +118,8 @@ void NumPadTextEdit::onCombKeysTimeout()
         } else if (m_key_queue.back() == Qt::Key_4) {
             insertPlainText("d");
         } else if (m_key_queue.back() == Qt::Key_3) {
-            insertPlainText("k");
-        } else if (m_key_queue.back() == Qt::Key_2 || m_key_queue.back() == Qt::Key_9) {
+            insertPlainText("s");
+        } else if (m_key_queue.back() == Qt::Key_2) {
             insertPlainText("h");
         } else if (m_key_queue.back() == Qt::Key_1) {
             insertPlainText("o");
